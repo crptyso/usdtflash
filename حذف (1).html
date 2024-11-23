@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Gateway - USDT via TRC20</title>
+
+    <!-- Adding Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            color: #fff; /* White text for better contrast */
+            background-color: black; /* Black background */
+            overflow: hidden;
+            transition: background-color 1s ease-in-out; /* Smooth transition for background color */
+        }
+
+        .container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 2; /* Ensure text stays on top of barcode */
+        }
+
+        h2 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .input-field {
+            margin: 10px 0;
+            padding: 10px;
+            width: 80%;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #218838;
+        }
+
+        .timer {
+            font-size: 24px;
+            color: #d9534f;
+            margin: 20px 0;
+        }
+
+        .copy-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .copy-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Styling for USDT color */
+        .usdt {
+            color: #ffcc00;
+            font-weight: bold;
+        }
+
+        /* Styling for the barcode image */
+        .barcode-container {
+            position: absolute;
+            top: 25%; /* Place barcode image slightly down */
+            left: 50%;
+            transform: translateX(-50%); /* Center barcode horizontally */
+            z-index: 1; /* Ensure barcode stays below text */
+        }
+
+        .barcode-image {
+            width: 300px; /* Increase width for clearer barcode */
+            height: auto; /* Maintain aspect ratio */
+        }
+
+        /* Media Queries */
+        /* Hide barcode on mobile devices (screen width less than 768px) */
+        @media (max-width: 768px) {
+            .barcode-container {
+                display: none; /* Hide barcode image on mobile */
+            }
+        }
+
+        /* Display barcode only on screens larger than 768px (desktop) */
+        @media (min-width: 769px) {
+            .barcode-container {
+                display: block; /* Show barcode image on desktop */
+            }
+        }
+
+        .content-above-barcode {
+            z-index: 2; /* Ensure content is above the barcode */
+        }
+
+        /* Message Styling */
+        .message {
+            background-color: #007bff;
+            padding: 15px;
+            border-radius: 5px;
+            color: white;
+            font-size: 18px;
+            margin-top: 20px;
+            display: none; /* Initially hidden */
+        }
+    </style>
+</head>
+<body>
+
+<!-- Main Content Above Barcode -->
+<div class="container content-above-barcode">
+    <h2>Payment Gateway - USDT (TRC20)</h2>
+    <p>Please send <strong class="usdt">500 USDT</strong> to the following wallet:</p>
+    <div style="display: flex; justify-content: center; align-items: center;">
+        <p id="wallet-address" style="margin: 0; font-size: 18px;"><strong>TCf9WV1BJYbwFMAdeH5cFerU51261tPV7K</strong></p>
+        <button class="copy-button" onclick="copyWalletAddress()">Copy</button>
+    </div>
+
+    <p>After the payment, please enter your wallet address to complete the process:</p>
+    <input type="text" id="wallet" class="input-field" placeholder="Enter your wallet address">
+    
+    <button class="button" onclick="startPaymentProcess()">Complete Payment</button>
+    
+    <div class="timer" id="countdown">10:00</div>
+
+    <!-- Message that will be displayed after payment -->
+    <div id="paymentMessage" class="message">
+        The payment is being verified, and the flash will be sent to your wallet shortly.
+    </div>
+</div>
+
+<!-- Barcode Image Below Content -->
+<div class="barcode-container">
+    <img src="https://ugc.production.linktr.ee/94106f98-238c-40dd-9bad-907923c1dbcd_qr-code.png?io=true&size=avatar-v3_0" alt="Wallet Barcode" class="barcode-image">
+</div>
+
+<script>
+    // Function to copy wallet address to clipboard
+    function copyWalletAddress() {
+        const walletAddress = document.getElementById('wallet-address').textContent;
+        navigator.clipboard.writeText(walletAddress).then(() => {
+            alert("Wallet address copied to clipboard!");
+        }).catch(err => {
+            alert("Failed to copy address: " + err);
+        });
+    }
+
+    // Countdown timer logic
+    let countdownElement = document.getElementById('countdown');
+    let timeLeft = 10 * 60; // 10 minutes in seconds
+
+    function updateCountdown() {
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
+        countdownElement.innerHTML = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+        if (timeLeft > 0) {
+            timeLeft--;
+        } else {
+            alert("Time's up! Please try again.");
+            window.location.reload();
+        }
+    }
+
+    setInterval(updateCountdown, 1000);
+
+    // Function to handle payment and display the message
+    function startPaymentProcess() {
+        let wallet = document.getElementById('wallet').value;
+        if (wallet === "") {
+            alert("Please enter your wallet address.");
+            return;
+        }
+        // Display message after payment button is clicked
+        document.getElementById('paymentMessage').style.display = "block";
+        setTimeout(function() {
+            alert("Payment has been successfully processed. Flash will be sent to your wallet.");
+        }, 3000); // Simulate delay before showing confirmation message
+    }
+</script>
+
+</body>
+</html>
